@@ -60,8 +60,9 @@ export default defineConfig({
         // КЛЮЧЕВОЙ МОМЕНТ: Зависимость гарантирует, что 'setup' будет выполнен первым
         dependencies: ['setup'],
         // Игнорируем setup-файл, так как он уже выполнен
-        testIgnore: /.*\.setup\.(ts|spec\.ts)/,
-
+        testIgnore: [/.*\.setup\.(ts|spec\.ts)/,
+        '**/tests/auth.ci.token.generator.spec.ts',
+         ],
     },
 
     // {

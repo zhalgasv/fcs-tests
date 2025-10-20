@@ -24,6 +24,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
+
+    testIgnore: '**/tests/auth.ci.token.generator.spec.ts',
   /* Opt out of parallel tests on CI. */
   workers: 1,
     outputDir:'test-results',

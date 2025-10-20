@@ -87,7 +87,7 @@ export class ManufacturePage {
 
         console.log(`✅ Выбран продукт: ${productName}`);
     }
-    ч
+
     async getComponentsFromUI(): Promise<ManufactureComponent[]> {
         const rows = this.page.locator('[data-pw-product-title]');
         const count = await rows.count();
@@ -117,19 +117,6 @@ export class ManufacturePage {
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Остатки товаров');
     }
 
-    async filterProductsByName(productName: string) {
-        const filterInput = this.page.locator("[data-pw-query-filter-input]");
-        await filterInput.fill(productName);
-        await expect(this.page.getByRole("link", { name: productName })).toBeVisible({
-            timeout: 10000,
-        });
-    }
-
-    async viewProductDetails(productName: string) {
-        const productLink = this.page.getByRole("link", { name: productName });
-        await productLink.click();
-        await expect(this.page).toHaveURL(/\/products\/.*\/view$/);
-    }
 
     async getProductAmountsByStorages(productName: string) {
         await this.goToProductsPage();

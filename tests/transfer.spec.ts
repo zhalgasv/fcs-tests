@@ -16,18 +16,18 @@ test.describe('Перемещение', () => {
     test('Новое перемешение', async ({page}) => {
         const transfer = new TransferPage(page);
 
-        const productName = 'Заготовка ягодный';
+        const productName = 'Лимонная кислота';
         const transferAmount = 3;
 
-        const sourceStorage = 'Склад Магазин';
-        const destinationStorage = 'Склад Бар';
+        const sourceStorage = 'Склад Бар';
+        const destinationStorage = 'Склад Магазин';
 
 
         await transfer.goToProductsPage();
         const initialData = await transfer.getProductAmountsByStorages(productName);
 
-        const initialSourceAmount = initialData.amounts[sourceStorage];
-        const initialDestinationAmount = initialData.amounts[destinationStorage];
+        const initialSourceAmount = initialData.amounts[sourceStorage] ?? 0;
+        const initialDestinationAmount = initialData.amounts[destinationStorage] ?? 0;
         const uom = initialData.uom;
 
 

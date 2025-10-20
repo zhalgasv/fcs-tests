@@ -16,11 +16,11 @@ test.describe('Списание', () => {
     test('Новое списание', async ({page}) => {
        const discard = new DiscardPage(page);
 
-        const productName = 'Кофе для эспрессо без кофеина';
+        const productName = 'Молоко кокосовое';
         const discardAmount = 3; // Количество для списания (в кг/шт)
         const storageToDiscardFrom = 'Склад Бар'; // Склад, с которого списываем
         const reason = 'Бесплатное кофе';
-        const date = '15.09.2025';
+         const date = '';
 
         await discard.goToProductsPage(); // Переходим на страницу остатков
         const initialData = await discard.getProductAmountsByStorages(productName);

@@ -42,7 +42,8 @@ export class TransferPage {
         await productSelect.click();
         await productSelect.fill(name);
 
-        const desiredItem = this.page.locator('nz-option-item', { hasText: name })
+        const desiredItem = this.page.getByText(name, { exact: true });
+
         await expect(desiredItem).toBeVisible({ timeout: 5000 });
         await desiredItem.click();
 
@@ -82,21 +83,30 @@ export class TransferPage {
         await this.page.goto('http://localhost:4400/products');
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Остатки товаров');
     }
-    async filterProductsByName(productName: string) {
-        const filterInput = this.page.locator('[data-pw-query-filter-input]');
-        await filterInput.fill(productName);
-        // Добавьте проверку, что таблица отфильтровалась, например,
-        // await expect(this.page.locator('tr').filter({ hasText: productName })).toBeVisible();
-        await this.page.waitForSelector(`text=${productName}`, { timeout: 10000 });
-    }
+
 
     async getProductAmountsByStorages(productName: string): Promise<ProductAmountsResult> {
+        await this.goToProductsPage();
+
+        const filterInput = this.page.locator('[data-pw-query-filter-input]');
+        await filterInput.fill(productName);
+        await this.page.waitForTimeout(500);
 
 
-        await this.filterProductsByName(productName);
-        await this.viewProductDetails(productName);
+        const productLink = this.page
+            .locator('a', { hasText: new RegExp(`^\\s*${productName}\\s*$`, 'i') });
+
+        await expect(productLink).toBeVisible({ timeout: 10000 });
+
+
+        await productLink.scrollIntoViewIfNeeded();
+        await productLink.click();
+
+        // ждем переход на страницу продукта
+        await this.page.waitForURL(/\/products\/.*\/view/, { timeout: 15000 });
 
         const uomElement = this.page.locator('[data-pw-storage] [data-pw-storage-uom]').first();
+        await expect(uomElement).toBeVisible({ timeout: 15000 });
         const uomText = await uomElement.innerText();
         const uom = uomText.trim();
 
@@ -133,9 +143,4 @@ export class TransferPage {
     }
 
 
-    async viewProductDetails(productName:string){
-        const productLink = this.page.getByRole('link', { name: productName });
-        await productLink.click();
-        await expect(this.page).toHaveURL(/\/products\/.*\/view$/);
-    }
 }

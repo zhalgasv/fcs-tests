@@ -1,10 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
-
+import * as path from 'path';
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
+
+const AUTH_FILE_PATH = process.env.CI_AUTH_PATH || 'auth.json';
+console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
+
 // import dotenv from 'dotenv';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
@@ -15,49 +19,60 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
+    outputDir:'test-results',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+    reporter: [['list'],
+        ['junit', { outputFile: 'test-results/junit.xml' }],
+        ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+    /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+      video:'on',
+      screenshot: 'only-on-failure',
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
       baseURL: 'https://mn.fcs.baimly.dev',
-      storageState: 'auth.json',
+      storageState: AUTH_FILE_PATH,
       headless: false,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'on',
   },
 
   /* Configure projects for major browsers */
   projects: [
       {
           name: 'setup',
-          testMatch: /.*\.setup\.ts/,   // выполняет только setup-тесты
+          testMatch: /.*\.setup\.ts/,
+          use: { headless: true }, // выполняет только setup-тесты
       },
     {
         name: 'chromium',
-        use: { ...devices['Desktop Chrome'], storageState: 'auth.json' },
+        // Использует настройки из глобального 'use' (включая storageState)
+        use: { ...devices['Desktop Chrome'] },
+        // КЛЮЧЕВОЙ МОМЕНТ: Зависимость гарантирует, что 'setup' будет выполнен первым
         dependencies: ['setup'],
+        // Игнорируем setup-файл, так как он уже выполнен
+        testIgnore: /.*\.setup\.(ts|spec\.ts)/,
+
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'], storageState: 'auth.json' },
-        dependencies: ['setup'],
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'], storageState: 'auth.json' },
-        dependencies: ['setup'],
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'], storageState: 'auth.json' },
+    //     dependencies: ['setup'],
+    // },
+    //
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'], storageState: 'auth.json' },
+    //     dependencies: ['setup'],
+    // },
 
     /* Test against mobile viewports. */
     // {

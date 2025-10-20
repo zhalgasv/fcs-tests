@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import {ProductAmountsResult} from "./TransferPage";
 
 export class SupplyPage {
     constructor(private page: Page) {}
@@ -95,11 +96,30 @@ export class SupplyPage {
 
     }
 
-    async getProductAmountsByStorages(productName: string): Promise<Record<string, number>> {
+    async getProductAmountsByStorages(productName: string): Promise<ProductAmountsResult> {
+        await this.goToProductsPage();
+
+        const filterInput = this.page.locator('[data-pw-query-filter-input]');
+        await filterInput.fill(productName);
+        await this.page.waitForTimeout(500);
 
 
-        await this.filterProductsByName(productName);
-        await this.viewProductDetails(productName);
+        const productLink = this.page
+            .locator('a', {hasText: new RegExp(`^\\s*${productName}\\s*$`, 'i')});
+
+        await expect(productLink).toBeVisible({timeout: 10000});
+
+
+        await productLink.scrollIntoViewIfNeeded();
+        await productLink.click();
+
+        // ждем переход на страницу продукта
+        await this.page.waitForURL(/\/products\/.*\/view/, {timeout: 15000});
+
+        const uomElement = this.page.locator('[data-pw-storage] [data-pw-storage-uom]').first();
+        await expect(uomElement).toBeVisible({timeout: 15000});
+        const uomText = await uomElement.innerText();
+        const uom = uomText.trim();
 
         const storageTags = this.page.locator('[data-pw-storage]');
         const count = await storageTags.count();
@@ -122,18 +142,15 @@ export class SupplyPage {
             const amount = parseInt(amountText.trim(), 10);
 
 
-
-            if(storageName && !isNaN(amount)) {
+            if (storageName && !isNaN(amount)) {
                 result[storageName] = amount;
             }
         }
-        return result;
-    }
+        return {
+            amounts: result,
+            uom: uom
+        };
 
 
-    async viewProductDetails(productName:string){
-        const productLink = this.page.getByRole('link', { name: productName });
-        await productLink.click();
-        await expect(this.page).toHaveURL(/\/products\/.*\/view$/);
     }
 }

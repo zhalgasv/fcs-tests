@@ -8,7 +8,7 @@ test.describe('Поставка товаров', () => {
     test('Создание новой поставки', async ({page}) => {
         const supply = new SupplyPage(page);
 
-        const productName = 'Кофе для эспрессо без кофеина';
+        const productName = 'Молоко кокосовое';
         const purchaseAmount = 10;
         const unitPrice = 300;
         const destinationStorage = 'Склад Бар';
@@ -18,7 +18,7 @@ test.describe('Поставка товаров', () => {
         await supply.goToProductsPage();
         const initialAmounts = await supply.getProductAmountsByStorages(productName);
 
-        const initialDestinationAmount = initialAmounts[destinationStorage];
+        const initialDestinationAmount = initialAmounts.amounts[destinationStorage];
 
         expect(initialDestinationAmount, `ERROR: Не найдено начальное количество для склада: ${destinationStorage}.`).not.toBeUndefined();
 
@@ -32,7 +32,7 @@ test.describe('Поставка товаров', () => {
 // или кликнуть в body
         await page.click('body', { position: { x: 0, y: 0 } });
 
-        await supply.selectSupplier('ИП Арна')
+        await supply.selectSupplier('ИП АРНА')
         await supply.addProduct(productName, purchaseAmount, unitPrice);
         await supply.selectWarehouse(destinationStorage);
 
@@ -41,7 +41,7 @@ test.describe('Поставка товаров', () => {
         await supply.goToProductsPage();
         const finalAmounts = await supply.getProductAmountsByStorages(productName);
 
-        const finalDestinationAmount = finalAmounts[destinationStorage];
+        const finalDestinationAmount = finalAmounts.amounts[destinationStorage];
 
 
         const expectedIncreaseInSystemUnits = purchaseAmount * UNIT_CONVERSION_FACTOR;

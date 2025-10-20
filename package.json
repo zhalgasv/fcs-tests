@@ -7,13 +7,18 @@
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
     "test:headed": "npx playwright test --headed",
-    "test:report": "npx playwright show-report"
+    "test:report": "npx playwright show-report",
+    "auth:local": "playwright test auth.setup.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
+    "@types/inquirer": "^9.0.9",
     "@types/node": "^24.3.0"
+  },
+  "dependencies": {
+    "inquirer": "^12.9.6"
   }
 }

@@ -158,12 +158,27 @@ export class ConversionPage {
     }
 
     async getProductAmountsByStorages(productName: string): Promise<ProductAmountsResult> {
+        await this.goToProductsPage();
+
+        const filterInput = this.page.locator('[data-pw-query-filter-input]');
+        await filterInput.fill(productName);
+        await this.page.waitForTimeout(500);
 
 
-        await this.filterProductsByName(productName);
-        await this.viewProductDetails(productName);
+        const productLink = this.page
+            .locator('a', { hasText: new RegExp(`^\\s*${productName}\\s*$`, 'i') });
+
+        await expect(productLink).toBeVisible({ timeout: 10000 });
+
+
+        await productLink.scrollIntoViewIfNeeded();
+        await productLink.click();
+
+        // ждем переход на страницу продукта
+        await this.page.waitForURL(/\/products\/.*\/view/, { timeout: 15000 });
 
         const uomElement = this.page.locator('[data-pw-storage] [data-pw-storage-uom]').first();
+        await expect(uomElement).toBeVisible({ timeout: 15000 });
         const uomText = await uomElement.innerText();
         const uom = uomText.trim();
 

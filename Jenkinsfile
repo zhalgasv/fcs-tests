@@ -9,7 +9,8 @@ pipeline {
         // Определяем полный путь к исполняемому файлу Docker для macOS/Linux.
         // Возвращаем путь к /usr/local/bin/docker, так как он работал ранее.
         DOCKER_CLI_PATH = '/usr/local/bin/docker'
-        DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:lts-slim'
+        // Обновляем тег образа: 'lts-slim' больше не существует. Используем актуальный 'jammy'.
+        DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:jammy'
     }
 
     stages {

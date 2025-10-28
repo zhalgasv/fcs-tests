@@ -7,8 +7,9 @@ pipeline {
         // Укажите здесь публичный адрес вашего Staging-сервера
         E2E_BASE_URL = 'http://localhost:4400' 
         // Определяем полный путь к исполняемому файлу Docker для macOS/Linux.
-        // ЭТО РЕШАЕТ ПРОБЛЕМУ "docker: command not found"
-        DOCKER_CLI_PATH = '/usr/local/bin/docker'
+        // Используем путь Homebrew, так как он более вероятен для macOS.
+        DOCKER_CLI_PATH = '/opt/homebrew/bin/docker'
+        DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:lts-slim'
     }
 
     stages {
@@ -16,6 +17,11 @@ pipeline {
         stage('Run E2E Tests') {
             steps {
                 echo "Running Playwright E2E Tests against ${env.E2E_BASE_URL}..."
+                
+                // Предварительно загружаем Docker-образ, чтобы избежать проблем с docker-credential-desktop
+                sh label: 'Pre-pull Docker Image', script: """
+                    ${DOCKER_CLI_PATH} pull ${DOCKER_IMAGE}
+                """
                 
                 // Используем withCredentials для безопасного предоставления токена PLAYWRIGHT_CI_AUTH_TOKEN.
                 withCredentials([string(
@@ -30,7 +36,7 @@ pipeline {
                         -w /app \\
                         -e PLAYWRIGHT_BASE_URL=''' + env.E2E_BASE_URL + ''' \\
                         -e PLAYWRIGHT_AUTH_TOKEN=\"''' + PLAYWRIGHT_AUTH_TOKEN + '''\" \\
-                        mcr.microsoft.com/playwright/node:lts-slim /bin/bash -c "
+                        ''' + DOCKER_IMAGE + ''' /bin/bash -c "
                         
                         echo 'Installing npm dependencies...'
                         npm ci

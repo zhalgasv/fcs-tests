@@ -29,7 +29,7 @@ pipeline {
                         -v "$(pwd):/app" \\
                         -w /app \\
                         -e PLAYWRIGHT_BASE_URL=''' + env.E2E_BASE_URL + ''' \\
-                        -e PLAYWRIGHT_AUTH_TOKEN=''' + PLAYWRIGHT_AUTH_TOKEN + ''' \\
+                        -e PLAYWRIGHT_AUTH_TOKEN=\"''' + PLAYWRIGHT_AUTH_TOKEN + '''\" \\
                         mcr.microsoft.com/playwright/node:lts-slim /bin/bash -c "
                         
                         echo 'Installing npm dependencies...'

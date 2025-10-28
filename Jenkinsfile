@@ -7,7 +7,8 @@ pipeline {
 
         // ✅ Новый стабильный Playwright-образ (вместо node:20-jammy)
         // Проверено: доступен и поддерживается в 2025 году
-        DOCKER_IMAGE = 'mcr.microsoft.com/playwright:v1.49.1-jammy'
+        DOCKER_IMAGE = 'mcr.microsoft.com/playwright:v1.55.0-jammy'
+
     }
 
     stages {

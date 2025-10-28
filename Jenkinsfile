@@ -7,8 +7,8 @@ pipeline {
         // Укажите здесь публичный адрес вашего Staging-сервера
         E2E_BASE_URL = 'http://localhost:4400' 
         // Определяем полный путь к исполняемому файлу Docker для macOS/Linux.
-        // Используем путь Homebrew, так как он более вероятен для macOS.
-        DOCKER_CLI_PATH = '/opt/homebrew/bin/docker'
+        // Возвращаем путь к /usr/local/bin/docker, так как он работал ранее.
+        DOCKER_CLI_PATH = '/usr/local/bin/docker'
         DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:lts-slim'
     }
 

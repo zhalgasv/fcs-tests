@@ -7,10 +7,9 @@ pipeline {
         // Укажите здесь публичный адрес вашего Staging-сервера
         E2E_BASE_URL = 'http://localhost:4400' 
         // Определяем полный путь к исполняемому файлу Docker для macOS/Linux.
-        // Возвращаем путь к /usr/local/bin/docker, так как он работал ранее.
         DOCKER_CLI_PATH = '/usr/local/bin/docker'
-        // Обновляем тег образа: 'lts-slim' больше не существует. Используем актуальный 'jammy'.
-        DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:jammy'
+        // ОКОНЧАТЕЛЬНОЕ ИСПРАВЛЕНИЕ ТЕГА: Используем максимально стабильный и специфичный тег (Node 20 на Jammy)
+        DOCKER_IMAGE = 'mcr.microsoft.com/playwright/node:20-jammy'
     }
 
     stages {
@@ -30,7 +29,6 @@ pipeline {
                     variable: 'PLAYWRIGHT_AUTH_TOKEN'          // Имя переменной, которая будет доступна в Shell
                 )]) {
                     // Используем Docker для создания изолированной среды тестирования
-                    // Используем DOCKER_CLI_PATH для явного вызова Docker
                     sh label: 'Run E2E Tests in Docker', script: '''
                     ${DOCKER_CLI_PATH} run --rm \\
                         -v "$(pwd):/app" \\

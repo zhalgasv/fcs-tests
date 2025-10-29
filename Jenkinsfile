@@ -12,39 +12,39 @@ pipeline {
             steps {
                 echo "🚀 Running Playwright E2E Tests against ${env.E2E_BASE_URL}..."
 
-                sh """
+                sh label: 'Pre-pull Docker Image', script: """
                     ${DOCKER_CLI_PATH} pull ${DOCKER_IMAGE}
                 """
 
-                // 🔐 Подключаем секретный auth-файл
                 withCredentials([file(credentialsId: 'PLAYWRIGHT_CI_AUTH_FILE', variable: 'AUTH_FILE')]) {
-                    sh '''
+                    sh label: 'Run E2E Tests in Docker', script: '''
                         echo "🔍 Проверяем, существует ли файл: $AUTH_FILE"
                         if [ ! -f "$AUTH_FILE" ]; then
-                          echo "❌ Файл не найден!"
-                          exit 1
+                            echo "❌ Файл аутентификации не найден!"
+                            exit 1
                         fi
 
                         echo "📋 Содержимое каталога с файлом:"
-                        ls -la $(dirname "$AUTH_FILE")
+                        ls -la "$(dirname $AUTH_FILE)"
 
                         echo "🚀 Запускаем контейнер..."
-                        CONTAINER_ID=$(${DOCKER_CLI_PATH} run -d \
-                            -v "$(pwd):/app" \
-                            -w /app \
+                        CONTAINER_ID=$(${DOCKER_CLI_PATH} run -d -v "$(pwd):/app" -w /app \
                             -e PLAYWRIGHT_BASE_URL=''' + env.E2E_BASE_URL + ''' \
                             ''' + env.DOCKER_IMAGE + ''' tail -f /dev/null)
 
-                        echo "🔐 Копируем файл в контейнер..."
-                        ${DOCKER_CLI_PATH} cp "$AUTH_FILE" $CONTAINER_ID:/app/tests/auth/ci-auth-long-life.json
+                        echo "🔐 Создаём папку для файла в контейнере..."
+                        ${DOCKER_CLI_PATH} exec $CONTAINER_ID mkdir -p /app/tests/auth
 
-                        echo "▶️ Запускаем тесты..."
+                        echo "🔐 Копируем файл в контейнер..."
+                        ${DOCKER_CLI_PATH} cp $AUTH_FILE $CONTAINER_ID:/app/tests/auth/ci-auth-long-life.json
+
+                        echo "🏃 Запускаем Playwright тесты..."
                         ${DOCKER_CLI_PATH} exec $CONTAINER_ID bash -c "
-                            npm ci &&
+                            npm ci
                             npx playwright test --project=chromium
                         "
 
-                        echo "🧹 Останавливаем контейнер..."
+                        echo "🧹 Очищаем контейнер..."
                         ${DOCKER_CLI_PATH} stop $CONTAINER_ID
                     '''
                 }

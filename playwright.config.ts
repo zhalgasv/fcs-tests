@@ -6,7 +6,7 @@ import * as path from 'path';
  * https://github.com/motdotla/dotenv
  */
 
-const AUTH_FILE_PATH = process.env.CI_AUTH_PATH || 'auth.json';
+const AUTH_FILE_PATH = process.env.CI_AUTH_PATH || 'ci-auth-long-life.json';
 console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
 
 const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'https://mn.fcs.baimly.dev';

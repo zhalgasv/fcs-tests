@@ -4,41 +4,38 @@ pipeline {
     environment {
         E2E_BASE_URL = 'https://mn.fcs.baimly.dev'
         DOCKER_CLI_PATH = '/usr/local/bin/docker'
-
-        // ✅ Новый стабильный Playwright-образ (вместо node:20-jammy)
-        // Проверено: доступен и поддерживается в 2025 году
-        DOCKER_IMAGE = 'mcr.microsoft.com/playwright:v1.55.0-jammy'
+        DOCKER_IMAGE = 'mcr.microsoft.com/playwright:v1.55.0-jammy' // стабильный playwright-образ
     }
 
     stages {
         stage('Run E2E Tests') {
             steps {
-                echo "Running Playwright E2E Tests against ${env.E2E_BASE_URL}..."
+                echo "🚀 Running Playwright E2E Tests against ${env.E2E_BASE_URL}..."
 
-                // Предзагрузка образа, чтобы не было таймаутов
+                // Предзагрузка Docker-образа (ускоряет билд)
                 sh label: 'Pre-pull Docker Image', script: """
                     ${DOCKER_CLI_PATH} pull ${DOCKER_IMAGE}
                 """
 
-                withCredentials([string(
-                    credentialsId: 'PLAYWRIGHT_CI_AUTH_TOKEN',
-                    variable: 'PLAYWRIGHT_AUTH_TOKEN'
-                )]) {
-                    sh label: 'Run E2E Tests in Docker', script: '''
-                    ${DOCKER_CLI_PATH} run --rm \
-                        -v "$(pwd):/app" \
-                        -w /app \
-                        -e PLAYWRIGHT_BASE_URL=''' + env.E2E_BASE_URL + ''' \
-                        -e PLAYWRIGHT_AUTH_TOKEN="''' + PLAYWRIGHT_AUTH_TOKEN + '''" \
-                        ''' + DOCKER_IMAGE + ''' /bin/bash -c "
+                // 🔐 Используем Secret File
+                withCredentials([file(credentialsId: 'PLAYWRIGHT_CI_AUTH_FILE', variable: 'AUTH_FILE')]) {
+                    sh label: 'Run Playwright Tests in Docker', script: """
+                        ${DOCKER_CLI_PATH} run --rm \\
+                            -v "\$(pwd):/app" \\
+                            -w /app \\
+                            -e PLAYWRIGHT_BASE_URL=${E2E_BASE_URL} \\
+                            -e CI_AUTH_PATH="/app/tests/auth/ci-auth-long-life.json" \\
+                            ${DOCKER_IMAGE} /bin/bash -c "
+                                echo '📦 Installing npm dependencies...'
+                                npm ci
 
-                        echo 'Installing npm dependencies...'
-                        npm ci
+                                echo '🔐 Copying auth file into container...'
+                                cp \$AUTH_FILE /app/tests/auth/ci-auth-long-life.json
 
-                        echo 'Starting Playwright tests...'
-                        npx playwright test --project=chromium
-                        "
-                    '''
+                                echo '▶️ Starting Playwright tests...'
+                                npx playwright test --project=chromium
+                            "
+                    """
                 }
             }
         }
@@ -56,4 +53,3 @@ pipeline {
         }
     }
 }
-

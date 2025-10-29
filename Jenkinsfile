@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        E2E_BASE_URL = 'http://localhost:4400'
+        E2E_BASE_URL = 'http://host.docker.internal:4400'
         DOCKER_CLI_PATH = '/usr/local/bin/docker'
 
         // ✅ Новый стабильный Playwright-образ (вместо node:20-jammy)

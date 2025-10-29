@@ -9,6 +9,9 @@ import * as path from 'path';
 const AUTH_FILE_PATH = process.env.CI_AUTH_PATH || 'auth.json';
 console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
 
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'https://mn.fcs.baimly.dev';
+console.log(`Base URL: ${BASE_URL}`);
+
 // import dotenv from 'dotenv';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
@@ -17,6 +20,7 @@ console.log(`Используется файл аутентификации: ${A
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: false,
@@ -39,7 +43,7 @@ export default defineConfig({
       screenshot: 'only-on-failure',
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
-      baseURL: 'https://mn.fcs.baimly.dev',
+      baseURL: BASE_URL,
       storageState: AUTH_FILE_PATH,
       headless: true,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */

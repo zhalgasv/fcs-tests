@@ -5,13 +5,13 @@ export class SupplyPage {
     constructor(private page: Page) {}
 
     async openList() {
-        await this.page.goto('http://localhost:4400/storage-invoices/purchase?byOrder=false');
+        await this.page.goto('/storage-invoices/purchase?byOrder=false');
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Накладные');
     }
 
     async goToCreateForm(){
         await this.page.click('span:has-text("Добавить")');
-        await expect(this.page).toHaveURL('http://localhost:4400/storage-invoices/purchase/new');
+        await expect(this.page).toHaveURL('/storage-invoices/purchase/new');
     }
     async selectInvoiceDate(date: string) {
 
@@ -84,7 +84,7 @@ export class SupplyPage {
     }
 
     async goToProductsPage(){
-        await this.page.goto('http://localhost:4400/products');
+        await this.page.goto('/products');
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Остатки товаров');
     }
 

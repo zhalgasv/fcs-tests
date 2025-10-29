@@ -11,13 +11,13 @@ export class TransferPage {
     }
 
     async openList(){
-        await this.page.goto('http://localhost:4400/storage-invoices/transfer');
+        await this.page.goto('/storage-invoices/transfer');
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Накладные');
     }
 
     async goToCreateForm(){
         await this.page.click('span:has-text("Добавить")');
-        await expect(this.page).toHaveURL('http://localhost:4400/storage-invoices/transfer/new');
+        await expect(this.page).toHaveURL('/storage-invoices/transfer/new');
     }
 
 
@@ -80,7 +80,7 @@ export class TransferPage {
     }
 
     async goToProductsPage(){
-        await this.page.goto('http://localhost:4400/products');
+        await this.page.goto('/products');
         await expect(this.page.locator('nz-page-header-title')).toHaveText('Остатки товаров');
     }
 

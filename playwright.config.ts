@@ -6,8 +6,8 @@ import * as path from 'path';
  */
 
 const AUTH_FILE_PATH = process.env.CI
-    ? '/app/tests/auth/ci-auth-long-life.json' // ✅ реальный путь внутри контейнера
-    : path.resolve(__dirname, '../../ci-auth-long-life.json'); // локально// локально на ноутбуке
+    ? '/app/tests/auth/ci-auth-long-life.json' // ✅ правильный путь внутри Docker
+    : path.resolve(__dirname, 'tests/auth/ci-auth-long-life.json'); // ✅ локальный путь на ноутбуке
 
 console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
 

@@ -52,7 +52,7 @@ test.describe('Конвертация/Переработка', () => {
         const expectedFinalOutputAmount = initialOutputAmount + expectedOutputIncrease;
 
 
-        // --- 2. ACT: Создание накладной конвертации ---
+        // --- 2. ACT: Создание накладной конвертации ---///
 
         await conversion.openList();
         await conversion.goToCreateForm();

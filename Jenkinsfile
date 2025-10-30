@@ -12,12 +12,10 @@ pipeline {
             steps {
                 echo "🚀 Running Playwright E2E Tests against ${env.E2E_BASE_URL}..."
 
-                sh label: 'Pre-pull Docker Image', script: """
-                    ${DOCKER_CLI_PATH} pull ${DOCKER_IMAGE}
-                """
+                sh "${DOCKER_CLI_PATH} pull ${DOCKER_IMAGE}"
 
                 withCredentials([file(credentialsId: 'PLAYWRIGHT_CI_AUTH_FILE', variable: 'AUTH_FILE')]) {
-                    sh label: 'Run E2E Tests in Docker', script: '''
+                    sh '''
                         echo "🔍 Проверяем, существует ли файл: $AUTH_FILE"
                         if [ ! -f "$AUTH_FILE" ]; then
                             echo "❌ Файл аутентификации не найден!"
@@ -53,14 +51,8 @@ pipeline {
     }
 
     post {
-        always {
-            echo "Pipeline finished. Status: ${currentBuild.result}"
-        }
-        success {
-            echo '✅ E2E Tests PASSED!'
-        }
-        failure {
-            echo '❌ E2E Tests FAILED! Check console output for errors.'
-        }
+        always { echo "Pipeline finished. Status: ${currentBuild.result}" }
+        success { echo '✅ E2E Tests PASSED!' }
+        failure { echo '❌ E2E Tests FAILED! Check console output for errors.' }
     }
 }

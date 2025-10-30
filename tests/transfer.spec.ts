@@ -16,7 +16,7 @@ test.describe('Перемещение', () => {
     test('Новое перемешение', async ({page}) => {
         const transfer = new TransferPage(page);
 
-        const productName = 'Лимонная кислота';
+        const productName = 'Яблоки';
         const transferAmount = 3;
 
         const sourceStorage = 'Склад Бар';

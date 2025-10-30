@@ -8,7 +8,7 @@ test.describe('Поставка товаров', () => {
     test('Создание новой поставки', async ({page}) => {
         const supply = new SupplyPage(page);
 
-        const productName = 'Молоко кокосовое';
+        const productName = 'Яблоки';
         const purchaseAmount = 10;
         const unitPrice = 300;
         const destinationStorage = 'Склад Бар';

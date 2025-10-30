@@ -16,7 +16,7 @@ test.describe('Списание', () => {
     test('Новое списание', async ({page}) => {
        const discard = new DiscardPage(page);
 
-        const productName = 'Молоко кокосовое';
+        const productName = 'Яблоки';
         const discardAmount = 3; // Количество для списания (в кг/шт)
         const storageToDiscardFrom = 'Склад Бар'; // Склад, с которого списываем
         const reason = 'Бесплатное кофе';

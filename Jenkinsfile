@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         E2E_BASE_URL = 'mn.alarify.dev'
-        DOCKER_CLI_PATH = '/usr/local/bin/docker'
+        DOCKER_CLI_PATH = '/usr/bin/docker'
         DOCKER_IMAGE = 'mcr.microsoft.com/playwright:v1.55.0-jammy'
     }
 

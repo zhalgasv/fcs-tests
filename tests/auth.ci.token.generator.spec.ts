@@ -4,12 +4,12 @@ import * as path from 'path';
 
 
 
-const CI_AUTH_FILE = path.join(process.cwd(), 'ci-auth-long-life.json');
+ const CI_AUTH_FILE = path.join(process.cwd(), 'ci-auth-long-life.json');
 
 
     test('Генерация локальный сессии (Ручной вход)', async ({page}) => {
         // Открываем сайт
-        await page.goto('https://mn.fcs.baimly.dev/main');
+        await page.goto('https://mn.alarify.dev');
 
         console.log('⏳ У вас 60 секунд, чтобы войти вручную (используйте CI-аккаунт).');
 

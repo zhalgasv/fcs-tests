@@ -16,11 +16,11 @@ test.describe('Конвертация/Переработка', () => {
         const conversion = new ConversionPage(page);
 
         // --- Тестовые данные ---
-        const INPUT_PRODUCT_NAME = 'Сироп карамель';     // Сырье (списывается)
+        const INPUT_PRODUCT_NAME = 'Сироп лесной орех';     // Сырье (списывается)
         const OUTPUT_PRODUCT_NAME = 'Сироп ваниль';      // Конечный продукт (приходуется)
         const SOURCE_STORAGE = 'Склад Бар';
         const DESTINATION_STORAGE = 'Склад Бар';
-        const FORMULA_NAME = 'Сироп карамель - Сироп ваниль';
+        const FORMULA_NAME = 'Сироп лесной орех - Сироп ваниль';
         const AMOUNT_TO_CONVERT = 5;                     // Сколько сырья списываем (в UI-ед.)
         const EXPECTED_AMOUNT_PRODUCED = 5;              // Ожидаемый расчет Output (если формула 1:1)
         const date = '15.10.2025';
@@ -52,7 +52,7 @@ test.describe('Конвертация/Переработка', () => {
         const expectedFinalOutputAmount = initialOutputAmount + expectedOutputIncrease;
 
 
-        // --- 2. ACT: Создание накладной конвертации ---/////////////
+        // --- 2. ACT: Создание накладной конвертации ---/////////////0
 
         await conversion.openList();
         await conversion.goToCreateForm();

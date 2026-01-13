@@ -32,7 +32,7 @@ test.describe('Поставка товаров', () => {
 // или кликнуть в body
         await page.click('body', { position: { x: 0, y: 0 } });
 
-        await supply.selectSupplier('ИП АРНА')
+        await supply.selectSupplier('Ауезова ИП')
         await supply.addProduct(productName, purchaseAmount, unitPrice);
         await supply.selectWarehouse(destinationStorage);
 

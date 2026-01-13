@@ -7,11 +7,11 @@ import * as path from 'path';
 
 const AUTH_FILE_PATH = process.env.CI
     ? '/app/tests/auth/ci-auth-long-life.json' // ✅ правильный путь внутри Docker
-    : path.resolve(__dirname, 'tests/auth/ci-auth-long-life.json'); // ✅ локальный путь на ноутбуке
+    : path.resolve(__dirname, 'ci-auth-long-life.json'); // ✅ локальный путь на ноутбуке
 
 console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
 
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'https://mn.fcs.baimly.dev';
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'https://mn.alarify.dev';
 console.log(`Base URL: ${BASE_URL}`);
 
 // import dotenv from 'dotenv';
@@ -47,7 +47,7 @@ export default defineConfig({
     // baseURL: 'http://localhost:3000',
       baseURL: BASE_URL,
       storageState: AUTH_FILE_PATH,
-      headless: true,
+      headless: false,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
   },
@@ -64,7 +64,7 @@ export default defineConfig({
         // Использует настройки из глобального 'use' (включая storageState)
         use: { ...devices['Desktop Chrome'] },
         // КЛЮЧЕВОЙ МОМЕНТ: Зависимость гарантирует, что 'setup' будет выполнен первым
-        dependencies: ['setup'],
+        dependencies: [],
         // Игнорируем setup-файл, так как он уже выполнен
         testIgnore: [/.*\.setup\.(ts|spec\.ts)/,
         '**/tests/auth.ci.token.generator.spec.ts',

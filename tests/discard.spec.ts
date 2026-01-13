@@ -19,7 +19,7 @@ test.describe('Списание', () => {
         const productName = 'Яблоки';
         const discardAmount = 3; // Количество для списания (в кг/шт)
         const storageToDiscardFrom = 'Склад Бар'; // Склад, с которого списываем
-        const reason = 'Бесплатное кофе';
+        const reason = 'Бесплатный кофе';
          const date = '';
 
         await discard.goToProductsPage(); // Переходим на страницу остатков

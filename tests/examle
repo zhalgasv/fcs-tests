@@ -1,0 +1,167 @@
+pipeline {
+    agent none
+
+    environment {
+        SSH_USER          = "${SSH_USER}"
+        SSH_HOST          = "${SSH_HOST}"
+        SSH_PORT          = "${SSH_PORT}"
+        SSH_KEY           = "${SSH_KEY_ID}"
+        HOST_GRADLE_CACHE = "${HOST_GRADLE_CACHE}"
+
+        DEPLOY_ENV = "${env.BRANCH_NAME.contains('dev') ? 'dev' : (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master' ? 'prod' : 'other')}"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            agent any
+            steps {
+                echo "Pipeline started for branch: ${env.BRANCH_NAME}"
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: env.BRANCH_NAME]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CloneOption', depth: 50, noTags: false, reference: '', shallow: true]],
+                    userRemoteConfigs: [[
+                        url:'git@github.com:alarify-io/fcs.git',
+                        credentialsId: 'fcs_ssh_key1'
+                    ]]
+                ])
+            }
+        }
+
+        stage('PR Build / Checks') {
+            when { changeRequest() }
+            agent any
+            steps {
+                script {
+                    echo "🔍 Detecting changes in PR #${env.CHANGE_ID}"
+
+                    def changedFiles = ""
+
+                    // ИСПРАВЛЕНИЕ: Используем sshagent и явный URL для fetch, чтобы избежать ошибки HTTPS auth
+                    sshagent(['fcs_ssh_key1']) {
+                        // Fetch целевой ветки для сравнения
+                        sh "git fetch git@github.com:alarify-io/fcs.git ${env.CHANGE_TARGET} --depth=50"
+
+                        changedFiles = sh(
+                            returnStdout: true,
+                            script: "git diff --name-only origin/${env.CHANGE_TARGET}...HEAD || true"
+                        ).trim()
+                    }
+
+                    echo "Changed files:\n${changedFiles}"
+
+                    def paths = changedFiles ? changedFiles.tokenize('\n') : []
+                    if (paths.isEmpty()) {
+                        echo "ℹ️ No relevant code changes. Skipping."
+                        return
+                    }
+
+                    def refs = load 'cicd/pipelineRefs.groovy'
+                    def containerMapping = refs.getContainerMapping(env)
+
+                    // ИСПРАВЛЕНИЕ: Собираем задачи в Map, чтобы запустить их ПАРАЛЛЕЛЬНО
+                    def tasks = [:]
+
+                    containerMapping.each { pattern, data ->
+                        if (paths.any { it ==~ pattern }) {
+                            String taskKey = data.type
+
+                            // Если такая задача еще не добавлена
+                            if (!tasks.containsKey(taskKey)) {
+                                tasks[taskKey] = {
+                                    stage("Check: ${taskKey}") {
+                                        echo "✔ Detected change for: ${taskKey}. Using image: ${data.image}"
+
+                                        docker.image(data.image).inside("-u root") {
+                                            if (data.type == 'backend') {
+                                                sh "gradle build -x test --parallel --no-daemon"
+                                            }
+                                            else if (data.type == 'web') {
+                                                sh """
+                                                    cd web-apps
+                                                    npm ci
+                                                    npm run build
+                                                """
+                                            }
+                                           else if (data.type in ['cashbox', 'shop', 'kiosk']) {
+                                                sh """
+                                                    cd mobile-apps/${data.type}-app
+                                                    npm ci
+                                                    npm run build
+                                                """
+                                            }
+                                            else if (data.type == 'db-migrate') {
+                                                echo "DB Migration scripts changed. (Validation stub)"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (tasks) {
+                        echo "🚀 Running parallel checks for: ${tasks.keySet().join(', ')}"
+                        parallel(tasks)
+                    } else {
+                        echo "ℹ️ No buildable components found in changed files."
+                    }
+                }
+            }
+            post {
+                success {
+                    echo "✅ PR #${env.CHANGE_ID} Build SUCCESS"
+                }
+                failure {
+                    echo "❌ PR #${env.CHANGE_ID} Build FAILED"
+                }
+            }
+        }
+
+        stage('Merge / Deployment Trigger') {
+            when { not { changeRequest() } }
+            agent any
+            steps {
+                echo "🚀 Starting Merge Trigger for ${env.BRANCH_NAME}"
+
+                script {
+                    def changedFiles = ""
+                    try {
+                        changedFiles = sh(returnStdout: true, script: "git diff --name-only HEAD~1 HEAD || true").trim()
+                    } catch (Exception e) {
+                        changedFiles = sh(returnStdout: true, script: "git show --name-only --pretty=format:'' HEAD || true").trim()
+                    }
+
+                    def paths = changedFiles ? changedFiles.tokenize('\n') : []
+                    def refs = load 'cicd/pipelineRefs.groovy'
+                    def jobMapping = refs.getJobMapping()
+
+                    // ИСПРАВЛЕНИЕ: Используем Set, чтобы не триггерить джобу дважды
+                    def triggeredJobs = [] as Set
+
+                    jobMapping.each { pattern, jobName ->
+                        if (paths.any { it ==~ pattern }) {
+                            if (!triggeredJobs.contains(jobName)) {
+                                echo "⚡ Triggering ${jobName} (matched: ${pattern})"
+
+                                build(job: jobName, wait: false, propagate: false, parameters: [
+                                    string(name: 'TARGET_BRANCH', value: env.BRANCH_NAME),
+                                    string(name: 'ENVIRONMENT', value: env.DEPLOY_ENV)
+                                ])
+                                triggeredJobs.add(jobName)
+                            }
+                        }
+                    }
+
+                    if (triggeredJobs.isEmpty()) {
+                        echo "ℹ️ No relevant jobs triggered."
+                    } else {
+                        echo "✅ Triggered jobs: ${triggeredJobs.join(', ')}"
+                    }
+                }
+            }
+        }
+    }
+}

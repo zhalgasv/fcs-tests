@@ -110,7 +110,7 @@ export class DiscardPage {
         await expect(productLink).toBeVisible({timeout: 10000});
 
 
-        await productLink.scrollIntoViewIfNeeded();
+
         await productLink.click();
 
         // ждем переход на страницу продукта

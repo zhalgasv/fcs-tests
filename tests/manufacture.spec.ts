@@ -12,9 +12,9 @@ test('Производство: создание и проверка списа�
     const manufacture = new ManufacturePage(page);
 
     const STORAGE = "Склад Бар";
-    const PRODUCT_NAME = "П/Ф персик-щавель";
+    const PRODUCT_NAME = "П/Ф сахарный сироп";
     const DATE = "10.10.2025";
-    const tolerance = 10;
+    const tolerance = 1;
 
     // 1️ Открываем Производство и создаём накладную
     await manufacture.openList();

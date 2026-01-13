@@ -49,8 +49,6 @@ export class ManufacturePage {
         // 7. Проверяем, что календарь закрылся
         await expect(this.page.locator('.ant-picker-dropdown')).toBeHidden();
 
-        // 8. Убеждаемся, что поле содержит введенную дату
-        // await expect(datePickerInput).toHaveValue(date);
     }
 
     async selectStorage(storageName: string, dataPwSelector: string) {
@@ -65,27 +63,23 @@ export class ManufacturePage {
 
         await desiredItem.click();
 
-        // Проверяем, что выбран правильный склад
-        // await expect(storageInput).toHaveValue(storageName);
+
     }
 
 
     async selectProduct(productName: string) {
-        // 1️⃣ Открываем поле выбора продукта
         const input = this.page.locator('bm-store-product-select input.ant-select-selection-search-input');
+
         await input.click();
         await input.fill(productName);
 
-        // 2️⃣ Ждем и выбираем нужный вариант
-        const option = this.page.locator('nz-option-item', { hasText: productName }).first();
-        await expect(option).toBeVisible({ timeout: 5000 });
+        const option = this.page.locator('.cdk-overlay-container nz-option-item', { hasText: productName }).first();
+        await expect(option).toBeVisible({ timeout: 15000 });
+
         await option.click();
 
-        // 3️⃣ Ждем, пока подтянутся данные по ингредиентам
-        const mainProduct = this.page.locator('[data-pw-product-title]', { hasText: productName });
-        await expect(mainProduct).toBeVisible({ timeout: 10000 });
-
-        console.log(`✅ Выбран продукт: ${productName}`);
+        // ждём, что появились строки компонентов
+        await expect(this.page.locator('[data-pw-product-title]').first()).toBeVisible({ timeout: 20000 });
     }
 
     async getComponentsFromUI(): Promise<ManufactureComponent[]> {

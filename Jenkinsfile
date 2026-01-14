@@ -30,7 +30,18 @@ docker exec "$CONTAINER_ID" mkdir -p /app/tests/auth
 docker cp "$AUTH_FILE" "$CONTAINER_ID:/app/tests/auth/ci-auth-long-life.json"
 
 echo "📦 npm ci..."
-docker exec "$CONTAINER_ID" bash -lc "npm ci"
+docker exec "$CONTAINER_ID" bash -lc '
+  set -e
+  ls -la
+  test -f package.json
+  if [ -f package-lock.json ]; then
+    echo "✅ package-lock.json found"
+    npm ci
+  else
+    echo "⚠️ package-lock.json missing -> using npm install"
+    npm install --no-audit --no-fund
+  fi
+'
 
 echo "🧪 Run ONLY selected specs..."
 docker exec "$CONTAINER_ID" bash -lc '

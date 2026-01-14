@@ -6,8 +6,8 @@ import * as path from 'path';
  */
 
 const AUTH_FILE_PATH = process.env.CI
-    ? '/app/tests/auth/ci-auth-long-life.json' // ✅ правильный путь внутри Docker
-    : path.resolve(__dirname, 'ci-auth-long-life.json'); // ✅ локальный путь на ноутбуке
+    ? 'tests/auth/ci-auth-long-life.json'
+    : path.resolve(__dirname, 'ci-auth-long-life.json');
 
 console.log(`Используется файл аутентификации: ${AUTH_FILE_PATH}`);
 
@@ -47,7 +47,7 @@ export default defineConfig({
     // baseURL: 'http://localhost:3000',
       baseURL: BASE_URL,
       storageState: AUTH_FILE_PATH,
-      headless: false,
+      headless: true,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
   },

@@ -13,10 +13,16 @@ pipeline {
           sh '''#!/usr/bin/env bash
 set -euo pipefail
 
+echo "HOST PWD=$(pwd)"
+ls -la
+test -f package.json
+test -f playwright.config.ts
+
 docker pull "$DOCKER_IMAGE"
 
 CONTAINER_ID="$(docker run -d --ipc=host \
   -v "$PWD:/app" -w /app \
+  -e CI=1 \
   -e PLAYWRIGHT_BASE_URL="$E2E_BASE_URL" \
   "$DOCKER_IMAGE" tail -f /dev/null)"
 
@@ -31,7 +37,7 @@ docker cp "$AUTH_FILE" "$CONTAINER_ID:/app/tests/auth/ci-auth-long-life.json"
 
 echo "📦 npm ci..."
 docker exec "$CONTAINER_ID" bash -lc '
-  set -e
+  set -euo pipefail
   ls -la
   test -f package.json
   if [ -f package-lock.json ]; then
@@ -45,6 +51,7 @@ docker exec "$CONTAINER_ID" bash -lc '
 
 echo "🧪 Run ONLY selected specs..."
 docker exec "$CONTAINER_ID" bash -lc '
+  set -euo pipefail
   npx playwright test --project=chromium \
     tests/conversion.spec.ts \
     tests/discard.spec.ts \
@@ -62,7 +69,7 @@ docker exec "$CONTAINER_ID" bash -lc '
     always {
       archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
       archiveArtifacts artifacts: 'test-results/**', allowEmptyArchive: true
-      junit 'test-results/junit.xml'
+      junit testResults: 'test-results/junit.xml', allowEmptyResults: true
     }
   }
 }

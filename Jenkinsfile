@@ -36,7 +36,7 @@ pipeline {
           ])
 
           withCredentials([file(credentialsId: 'PLAYWRIGHT_CI_AUTH_FILE', variable: 'AUTH_FILE')]) {
-            sh '''
+            sh """
               set -euo pipefail
 
               rm -rf tests/auth
@@ -55,7 +55,7 @@ pipeline {
                 tests/manufacture.spec.ts \
                 tests/supply.spec.ts \
                 tests/transfer.spec.ts
-            '''
+            """
           }
         }
       }

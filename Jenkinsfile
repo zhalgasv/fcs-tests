@@ -36,26 +36,26 @@ pipeline {
           ])
 
           withCredentials([file(credentialsId: 'PLAYWRIGHT_CI_AUTH_FILE', variable: 'AUTH_FILE')]) {
-            sh """
-              set -euo pipefail
+            sh '''#!/usr/bin/env bash
+          set -euo pipefail
 
-              rm -rf tests/auth
-              mkdir -p tests/auth
-              cp "$AUTH_FILE" tests/auth/ci-auth-long-life.json
+          rm -rf tests/auth
+          mkdir -p tests/auth
+          cp "$AUTH_FILE" tests/auth/ci-auth-long-life.json
 
-              if [ -f package-lock.json ]; then
-                npm ci
-              else
-                npm install --no-audit --no-fund
-              fi
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
 
-              npx playwright test --project=chromium \
-                tests/conversion.spec.ts \
-                tests/discard.spec.ts \
-                tests/manufacture.spec.ts \
-                tests/supply.spec.ts \
-                tests/transfer.spec.ts
-            """
+          npx playwright test --project=chromium \
+            tests/conversion.spec.ts \
+            tests/discard.spec.ts \
+            tests/manufacture.spec.ts \
+            tests/supply.spec.ts \
+            tests/transfer.spec.ts
+          '''
           }
         }
       }

@@ -13,17 +13,27 @@ export class SupplyPage {
         await this.page.click('span:has-text("Добавить")');
         await expect(this.page).toHaveURL('/storage-invoices/purchase/new');
     }
-    async selectInvoiceDate(date: string) {
+    async selectInvoiceDate() {
 
 
-        const [year, month, day] = date.split('-');
-        const formattedDate = `${day}.${month}.${year}`;
+        // const [year, month, day] = date.split('-');
+        // const formattedDate = `${day}.${month}.${year}`;
 
         // Кликаем в инпут, чтобы открыть календарь
-        await this.page.click('nz-date-picker[formcontrolname="incomingInvoiceDate"] input');
+        // await this.page.click('nz-date-picker[formcontrolname="incomingInvoiceDate"] input');
 
-        const dropdown = this.page.locator('.ant-picker-dropdown');
-        await expect(dropdown).toBeVisible();
+        const dateInput = this.page.locator('nz-date-picker[formcontrolname="incomingInvoiceDate"] input');
+        await dateInput.click();
+
+        // 2. Локатор именно для вашей кнопки "Сейчас"
+        const nowButton = this.page.locator('a.ant-picker-now-btn');
+
+        // 3. Ждем, когда кнопка появится (календарь откроется) и кликаем
+        await nowButton.waitFor({ state: 'visible', timeout: 5000 });
+        await nowButton.click();
+
+        // const dropdown = this.page.locator('.ant-picker-dropdown');
+        // await expect(dropdown).toBeVisible();
     }
 
 

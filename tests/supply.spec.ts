@@ -9,7 +9,7 @@ test.describe('Поставка товаров', () => {
         const supply = new SupplyPage(page);
 
         const productName = 'Яблоки';
-        const purchaseAmount = 10;
+        const purchaseAmount = 1;
         const unitPrice = 300;
         const destinationStorage = 'Склад Бар';
 
@@ -27,7 +27,7 @@ test.describe('Поставка товаров', () => {
 
         await supply.goToCreateForm();
 
-        await supply.selectInvoiceDate('2025-09-08');
+        await supply.selectInvoiceDate();
         await page.keyboard.press('Escape');
 // или кликнуть в body
         await page.click('body', { position: { x: 0, y: 0 } });

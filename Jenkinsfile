@@ -4,7 +4,7 @@ pipeline {
   environment {
     PLAYWRIGHT_BASE_URL = 'https://mn.alarify.dev'
     PW_IMAGE = 'mcr.microsoft.com/playwright:v1.55.0-jammy'
-    TESTS_REPO = 'https://github.com/alarify-io/fcs-test.git'
+    TESTS_REPO = 'https://github.com/zhalgasv/fcs.git'
     TESTS_BRANCH = 'main'
   }
 

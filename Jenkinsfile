@@ -25,7 +25,7 @@ pipeline {
         sh 'node -v && npm -v'
 
         // clone tests repo into subfolder inside workspace
-        dir('fcs-test') {
+        dir('apps/core/src/test/ui-tests/fcs-test') {
           checkout([
             $class: 'GitSCM',
             branches: [[name: "*/${TESTS_BRANCH}"]],

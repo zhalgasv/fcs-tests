@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "sessionId",
+      "value": "caba6d3b-3eeb-4bf4-8994-86418c674164",
+      "domain": "mn.fcs.baimly.dev",
+      "path": "/",
+      "expires": 1768719256.994446,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "sessionId",
+      "value": "eb9a49e7-5863-48fb-a5e8-174fde07f647",
+      "domain": "mn.alarify.dev",
+      "path": "/",
+      "expires": 1776077499.941111,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

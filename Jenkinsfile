@@ -9,11 +9,14 @@ pipeline {
   }
 
   stages {
+    stage('Clean workspace') {
+      steps { deleteDir() }
+    }
     stage('UI Tests (Playwright)') {
       agent {
         docker {
           image "${PW_IMAGE}"
-          args "-u root"
+          args "-u 1000:1000"
           reuseNode true
         }
       }

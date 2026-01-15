@@ -39,6 +39,7 @@ pipeline {
             sh '''
               set -euo pipefail
 
+              rm -rf tests/auth
               mkdir -p tests/auth
               cp "$AUTH_FILE" tests/auth/ci-auth-long-life.json
 
